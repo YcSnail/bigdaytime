@@ -15,10 +15,13 @@ class Time extends Model{
 
     public function setTime($title,$end_time){
 
+        $time = time();
+
         $saveData =
             [
                 'title'  =>  $title,
                 'end_time' =>  $end_time,
+                'create_time'=>$time,
                 'status'=>0
             ];
         $insertRes = Time::create($saveData);
@@ -30,7 +33,7 @@ class Time extends Model{
 
         // 查询数据集
         $timeList = Time::where('status', 0)
-            ->order('end_time', 'desc')
+            ->order('create_time', 'desc')
             ->field('end_time,title')
             ->select()
             ->toArray();
