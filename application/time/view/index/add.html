@@ -1,0 +1,156 @@
+{include file="public/header" /}
+
+<title>新增倒计时</title>
+
+<!-- 代码部分end -->
+<style>
+
+    .layui-form{
+        text-align: center;
+    }
+
+    .layui-form-item{
+        width: 40%;
+        margin: 15px auto;
+    }
+
+    .layui-input-block {
+         margin-left: 0;
+    }
+
+</style>
+
+
+<div class="layui-body">
+    <!-- 内容主体区域 -->
+    <div style="padding: 15px">
+
+        <form class="layui-form">
+
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <input type="text" name="title"  lay-verify="title" autocomplete="off" placeholder="请输入标题" class="layui-input">
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <input type="text" class="layui-input" name="end_time" id="test5" lay-verify="endTime"  placeholder="请选择截止时间" readonly="readonly">
+                </div>
+            </div>
+
+            <button style="width: 9%" type="button" class="layui-btn btn-submit" lay-submit="" lay-filter="demo1">保存</button>
+
+        </form>
+
+    </div>
+
+
+</div>
+
+
+
+<script>
+
+    //JavaScript代码区域
+    layui.use(['element', 'form', 'layer','laydate'], function () {
+        var element = layui.element
+            , form = layui.form
+            , laydate = layui.laydate
+            , layer = layui.layer;
+
+        laydate.render({
+            elem: '#test5'
+            ,type: 'datetime'
+            ,min: getNowFormatDate('day')
+            ,calendar: true
+        });
+
+        //自定义验证规则
+        form.verify({
+            title: function(value){
+                if(value.length == 0){
+                    return '输入标题啊! 笨比!!!';
+                }
+            },
+            endTime:function (value) {
+
+                if(value.length == 0){
+                    return '选择结束时间啊! 笨比!!!';
+                }
+
+                // 检查时间是否小于当前时间
+                var nowTime = Date.parse(new Date()) / 1000;
+                var selectTime = Date.parse(value) / 1000;
+
+                if (nowTime >= selectTime){
+                    return '结束时间不能小于当前时间! 笨比!!!';
+                }
+
+            }
+            
+        });
+
+        $().ready(function () {
+
+            $('.layui-nav-item:eq(1)').addClass('layui-this');
+
+            form.on('submit(demo1)', function(data){
+                // 提交数据
+                addTime(data.field);
+            });
+
+            function addTime(setData) {
+
+                var url = '/api/Time/add';
+                maskShow();
+
+                $.post(
+                    url,
+                    setData,
+                    function(result){
+                        maskClose();
+
+                        if (result.code == 0){
+
+                            layer.msg('新增成功,1s后返回列表界面');
+                            webJump('index');
+
+                        }else{
+                            layer.msg(result.message);
+
+                        }
+
+                    },
+                    'json'
+                );
+
+
+            }
+
+
+        });
+
+        function maskShow() {
+            var index = layer.load();
+
+            setTimeout(function(){
+                layer.close(index);
+            }, 5000);
+
+        }
+
+        function maskClose() {
+            layer.closeAll('loading');
+        }
+
+
+    });
+
+
+</script>
+
+</div>
+
+</body>
+</html>

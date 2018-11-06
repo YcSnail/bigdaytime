@@ -1,0 +1,165 @@
+{include file="public/header" /}
+
+<script src="/static/js/jquery.downCount.js"></script>
+<script src="/static/js/time.js"></script>
+<link rel="stylesheet" href="/static/css/time.css">
+
+
+<body style="overflow: hidden">
+
+
+<!-- 代码部分end -->
+<style>
+
+
+    @font-face{
+        font-family: 'Digital';
+        src: url('/static/font/Digital.ttf');
+        font-weight:normal;
+        font-style:normal
+    }
+
+    *,body{
+        font-family: "Digital";
+    }
+
+
+</style>
+
+<div id="starsBox"></div>
+
+<div class="time-content">
+
+
+</div>
+
+
+<script>
+
+    //JavaScript代码区域
+    layui.use(['element', 'form', 'layer','laypage'], function () {
+        var element = layui.element
+            , form = layui.form
+            , laypage = layui.laypage
+            , layer = layui.layer;
+
+        //自定义验证规则
+        form.verify({
+            required: function(value){
+                if(value.length == 0){
+                    return '输入要查的东西啊! 笨比!!!';
+                }
+            }
+        });
+
+        $().ready(function () {
+            $('.layui-nav-item:eq(0)').addClass('layui-this');
+
+            title('节日倒计时');
+            // 自动获取 时间列表
+            getTime();
+            function getTime() {
+
+                var url = '/api/Time/get';
+                maskShow();
+
+                $.post(
+                    url,
+                    {
+                        'getTime':'yc'
+                    },
+                    function(result){
+                        maskClose();
+
+                        if (result.code == 0){
+
+                            setList(result.message);
+                        }else{
+                            layer.msg(result.message);
+
+                        }
+
+                    },
+                    'json'
+                );
+
+
+            }
+
+            function setList(data) {
+
+                var timeList = '';
+
+                for (var i=0;i<data.length;i++){
+
+                    timeList +=
+                        '<div id="time'+i+'" class="time time-item" data-endtime="'+data[i]['end_time']+'">' +
+                        '    <div class="countdown countdown-container container">' +
+                        '        <div>' +
+                        '            <p>'+data[i]['title']+'</p>' +
+                        '        </div>' +
+                        '    </div>' +
+                        '    <ul class="countdown">' +
+                        '        <li><span class="days">00</span>' +
+                        '            <p class="days_ref">天</p>' +
+                        '        </li>' +
+                        '        <li class="seperator"> &nbsp</li>' +
+                        '        <li><span class="hours">00</span>' +
+                        '            <p class="hours_ref">时</p>' +
+                        '        </li>' +
+                        '        <li class="seperator">:</li>' +
+                        '        <li><span class="minutes">00</span>' +
+                        '            <p class="minutes_ref">分</p>' +
+                        '        </li>' +
+                        '        <li class="seperator">:</li>' +
+                        '        <li><span class="seconds">00</span>' +
+                        '            <p class="seconds_ref">秒</p>' +
+                        '        </li>' +
+                        '    </ul>' +
+                        '</div>';
+
+                }
+
+                $('.time-content').empty().append(timeList);
+
+                setAutoDown();
+            }
+
+            function setAutoDown() {
+
+                // 获取倒计时数量
+                for (var i=0;i<$('.time-item').length;i++){
+
+                    var endTime = $('.time-item:eq('+i+')').data('endtime');
+                    countDown('time'+i, endTime)
+                }
+
+
+            }
+
+
+        });
+
+        function maskShow() {
+            var index = layer.load();
+
+            setTimeout(function(){
+                layer.close(index);
+            }, 5000);
+
+        }
+
+        function maskClose() {
+            layer.closeAll('loading');
+        }
+
+
+    });
+
+
+</script>
+
+</div>
+
+</body>
+</html>
