@@ -33,7 +33,7 @@ class Time extends Model{
 
         // 查询数据集
         $timeList = Time::where('status', 0)
-            ->order('create_time', 'desc')
+            ->order('end_time')
             ->field('end_time,title')
             ->select()
             ->toArray();
