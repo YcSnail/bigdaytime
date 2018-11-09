@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no">
+    <title>获取随机密码</title>
+    <script src="/static/js/jquery-3.2.1.min.js"></script>
+    <script src="/static/js/clipboard.min.js"></script>
+
+    <style>
+        .notice{
+            height: 20px;
+            color:#f00;
+        }
+        .div-none{
+            display: none;
+        }
+
+        .btn{
+            width: 20%;
+            height: 200px;
+            padding: 10px;
+            border-radius: 6px;
+            background: #1b93fb;
+            color: #fff;
+            border: 0;
+        }
+    </style>
+
+</head>
+<body>
+
+
+<div>
+    <p class="pass"></p>
+    <p class="notice"></p>
+
+    <p>
+        长度
+        <select class="pslength">
+            <option value ="16">16</option>
+            <option value ="17">17</option>
+            <option value="18">18</option>
+            <option value="19">19</option>
+        </select>
+    </p>
+
+
+    <button class="btn copy" data-clipboard-action="copy" data-clipboard-target=".pass">复制</button>
+    <button class="btn reload">再次获取</button>
+</div>
+
+
+<script>
+
+    $().ready(function(){
+
+        // 获取密码
+        // 自动获取 时间列表
+        getTime();
+        function getTime() {
+
+            var pslength = $('.pslength').val();
+            var url = '/api/Md5/get';
+
+            $.post(
+                url,
+                {
+                    'Md5':'get',
+                    'pslength':pslength
+                },
+                function(result){
+
+                    if (result.code == 0){
+                        $('.pass').text(result.message);
+
+                    }else{
+                        layer.msg(result.message);
+
+                    }
+
+                },
+                'json'
+            );
+
+
+        }
+
+        var clipboard = new Clipboard('.copy');
+
+        clipboard.on('success', function(e) {
+            $('.notice').text('文本已经复制到剪切板');
+        });
+
+        clipboard.on('error', function(e) {
+            $('.notice').text('文本复制失败,清手动复制');
+        });
+
+        $('.reload').click(function(){
+            getTime();
+        })
+
+    });
+
+
+</script>
+
+
+</body>
+</html>
